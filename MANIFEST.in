@@ -1,0 +1,5 @@
+include README.md
+recursive-include res *.png
+recursive-include dsa *.png
+recursive-include quarz *.png
+recursive-include weights *.h5

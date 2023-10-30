@@ -1,0 +1,8 @@
+open3d>=0.12.0
+numpy
+opencv-python
+matplotlib
+Pillow
+scipy
+scikit-image
+tensorflow>=2.0
