@@ -1,4 +1,24 @@
-__pycache__
-3D_SEM.egg-info
 tmp
+.claude
 .vscode
+.DS_Store
+docker/.env
+
+# build artifacts
+*.egg-info/
+build/
+dist/
+
+# caches
+__pycache__
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# environments
+.venv/
+venv/
+
+# outputs
+*.npy
+reconstructed_point_cloud.npy
