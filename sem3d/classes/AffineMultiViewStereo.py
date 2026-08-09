@@ -37,6 +37,8 @@ import sem3d.segmentation.interactive_grabcut_segmentation as interactive_grabcu
 import sem3d.dense_matching.disparity_maps as dd
 import sem3d.visualization.output_visualization as vis
 
+from sem3d.segmentation.unet_weights import resolve_unet_weights
+
 #####################################
 
 
@@ -466,7 +468,7 @@ class AffineMultiViewStereo:
 
             else:
                 print('No method was choosen from rigid, similarity, affine and quasiEuclidean. '
-                                'Similarity is used as default.')
+                      'Similarity is used as default.')
                 # compute rectifying transformations
                 T1, T2 = rec.rectifying_similarities(self.epipolarSets[i]['F'])
 
@@ -557,6 +559,10 @@ class AffineMultiViewStereo:
 
         self.predictedMasks = []
 
+        model = unet.unet_model()
+        
+        model.load_weights(str(resolve_unet_weights()))
+        
         for rectSet in self.rectificationData:
 
             # input shape of the UNet
@@ -570,11 +576,6 @@ class AffineMultiViewStereo:
                                self.config['unetInputShape'][1], 1),
                               dtype=np.float32)
             imgSet[0, :, :, 0] = img1Resized
-
-            model = unet.unet_model()
-            weightsData = 'x32_128_no_weightmap_epoch_37_weights.h5'
-
-            model.load_weights(os.path.join('res/weights', weightsData))
 
             # get the prediction (mask)
             predict = model.predict([imgSet], verbose=1, batch_size=1)
