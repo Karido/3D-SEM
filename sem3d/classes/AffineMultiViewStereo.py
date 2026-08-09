@@ -14,8 +14,6 @@
 #                   """
 
 
-# libraries
-import os
 import copy
 import numpy as np
 import cv2
@@ -23,7 +21,6 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 from PIL import Image
 
-# packages
 import sem3d.utils.preprocessing as pp
 import sem3d.utils.utils as utils
 import sem3d.feature_matching.feature_matching as fm
@@ -31,7 +28,6 @@ import sem3d.epipolar_geometry.affine_epipolar_geometry_algorithms as aeg
 import sem3d.epipolar_geometry.distances as dist
 import sem3d.epipolar_geometry.rectification as rec
 import sem3d.factorization.factorization as fac
-import sem3d.segmentation.unet_x32_softmax as unet
 import sem3d.segmentation.segmentation as segmentation
 import sem3d.segmentation.interactive_grabcut_segmentation as interactive_grabcut_segmentation
 import sem3d.dense_matching.disparity_maps as dd
@@ -75,7 +71,7 @@ class AffineMultiViewStereo:
         config     - dict with flags and parameters
 
         --------------------------------------------------
-        matches     - list of dicts containing the matched features as pts1 and pts2 
+        matches     - list of dicts containing the matched features as pts1 and pts2
         """
 
         # determine dataType to select appropriate matching methods
@@ -124,10 +120,10 @@ class AffineMultiViewStereo:
         1) remove outliers based on u- and v-motion
         2) remove multiple matched matches
 
-        matches     - list of dicts containing the matched features as pts1 and pts2 
+        matches     - list of dicts containing the matched features as pts1 and pts2
         config     - dict with set flags
         --------------------------------------------------
-        matches     - list of dicts containing the matched features as pts1 and pts2 
+        matches     - list of dicts containing the matched features as pts1 and pts2
         """
 
         if self.config['motionConstraints'] == True:
@@ -181,9 +177,9 @@ class AffineMultiViewStereo:
         config         - dict
         --------------------------------------------------
         epiSets         - if nSets > 1: list of lists containing dictionaries
-                          if nsets = 1: list of dictionaries dict 
-                          dicts contain matches as pts1 and pts2, the 
-                          computed Fa and the robustly estimated standard 
+                          if nsets = 1: list of dictionaries dict
+                          dicts contain matches as pts1 and pts2, the
+                          computed Fa and the robustly estimated standard
                           deviation of the residuals
         """
 
@@ -322,7 +318,7 @@ class AffineMultiViewStereo:
     def measurement_matrix(self):
         """
         iterates over all matches
-        if in previous and next image matches are found, the feature point 
+        if in previous and next image matches are found, the feature point
         is saved and compared to the matches in the next image
 
         input:  epiSetsAffine - sets containing fundamental matrices and point correspondences
@@ -423,10 +419,10 @@ class AffineMultiViewStereo:
 
     def rectify_stereo_pairs(self):
         """
-        wrapper function which performs the rectification based on the 
+        wrapper function which performs the rectification based on the
         user specified config
 
-        spDense                 - list containing a list with the two images 
+        spDense                 - list containing a list with the two images
                                   of the stereo pair as uint8 numpy arrays
         epiSetsAffineSpDense    - list containing a dict with 'F', pts1, pts2
         config                 - dict
@@ -556,13 +552,20 @@ class AffineMultiViewStereo:
         return self
 
     def segment_rectified_images_unet(self):
+        try:
+            import sem3d.segmentation.unet_x32_softmax as unet
+        except ImportError as exc: # pragma: no cover
+            raise ImportError(
+                "Segmentation requires the optional TensorFlow dependency. "
+                "Install it with:  pip install '3d-sem[segmentation]'"
+            ) from exc # attach to the original exception for better debugging
 
         self.predictedMasks = []
 
         model = unet.unet_model()
-        
+
         model.load_weights(str(resolve_unet_weights()))
-        
+
         for rectSet in self.rectificationData:
 
             # input shape of the UNet

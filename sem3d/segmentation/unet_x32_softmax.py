@@ -11,44 +11,15 @@
 #                   architecture of the used unet model
 #                   """
 
-# packages
-import absl.logging
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 from tensorflow.keras import layers, backend
 import numpy as np
-import os
-import sys
-import logging
 
-# get rid of the tensorflow / tensorflow.python.keras console spam
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-# Keras outputs warnings using `print` to stderr, temporarily directed to devnull
-stderr = sys.stderr
-sys.stderr = open(os.devnull, "w")
-
-# from tensorflow.python.keras import layers, backend
-# from tensorflow.python.keras.models import Model
-
-# get rid of the tensorflow / tensorflow.python.keras console spam
-
-logging.root.removeHandler(absl.logging._absl_handler)
-absl.logging._warn_preinit_stderr = False
-logger = tf.get_logger()
-logger.setLevel(logging.FATAL)
-
-
-# keep the settings in the file as used for the training
-config = tf.compat.v1.ConfigProto()
-# dynamically grow the memory used on the GPU
-# config.gpu_config.allow_growth = True
-config.gpu_options.allow_growth = True
-# to log device placement (on which device the operation ran)
-config.log_device_placement = True
-sess = tf.compat.v1.Session(config=config)
-# set this TensorFlow session as the default session for Keras
-# backend.set_session(sess)
 _epsilon = tf.convert_to_tensor(backend.epsilon(), np.float32)
 
 
